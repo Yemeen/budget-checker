@@ -2,7 +2,6 @@ streamlit
 pandas
 numpy
 pdfplumber
-re
 openpyxl
 Pillow
 pytz
