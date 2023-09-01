@@ -105,13 +105,10 @@ def app():
             with col2:
                 # show properties
                 st.subheader('PDF Properties')
-                attrs = ['Annual Waiver Plan Services Total:',
+                attrs = ['Total Plan Year Cost:',
                          'Recalculated:', 'Plan Type:', 'Program Type:', 'Annual PCP Date']
                 for attr in attrs:
                     st.write(f'**{attr}** {find_text_pdf(attr, pdf_text)}')
-                # show monthly services
-                st.subheader('Monthly Services')
-                st.dataframe(monthly_services(pdf_text), hide_index=True)
             st.subheader('Excel Data')
             services = pd.DataFrame(columns=excel_df.columns)
             for index, row in excel_df.iloc[17:].iterrows():
@@ -121,6 +118,9 @@ def app():
                         [services, pd.DataFrame([row])], ignore_index=True, axis=0)
             services.drop(columns=[0, 6, 7, 8, 10, 11], axis=1, inplace=True)
             st.dataframe(services)
+            # show monthly services
+            st.subheader('Monthly Services')
+            st.dataframe(monthly_services(pdf_text), hide_index=True)
             st.markdown('#### IDFGS')
             st.dataframe(excel_df.iloc[136:142, :])
 
