@@ -68,6 +68,16 @@ def monthly_services(pdf_text: str):
         print("Monthly services not found!")
 
 
+def find_between(text, first_delimiter, second_delimiter):
+    try:
+        pattern = first_delimiter + ' (.*?) ' + second_delimiter
+        result = re.search(pattern, text).group(1)
+    except AttributeError:
+        # If delimiters are not found in the text
+        result = ''
+    return result
+
+
 def app():
     st.title('Budget Data Explorer')
 
@@ -105,10 +115,13 @@ def app():
             with col2:
                 # show properties
                 st.subheader('PDF Properties')
-                attrs = ['Total Plan Year Cost:',
-                         'Recalculated:', 'Plan Type:', 'Program Type:', 'Annual PCP Date']
+                attrs = ['Total Plan Year Cost:', 'Plan Type:']
                 for attr in attrs:
                     st.write(f'**{attr}** {find_text_pdf(attr, pdf_text)}')
+                st.markdown('**Program Type:** ' + find_between(pdf_text,
+                            'Program Type:', 'Meeting Date:'))
+                st.markdown('**Annual PCP Date:** ' + find_between(pdf_text,
+                            'Annual PCP Date:', 'Effective Date:'))
             st.subheader('Excel Data')
             services = pd.DataFrame(columns=excel_df.columns)
             for index, row in excel_df.iloc[17:].iterrows():
@@ -122,7 +135,12 @@ def app():
             st.subheader('Monthly Services')
             st.dataframe(monthly_services(pdf_text), hide_index=True)
             st.markdown('#### IDFGS')
-            st.dataframe(excel_df.iloc[136:142, :])
+            idfgs = pd.concat([excel_df.iloc[136:142, 1:3],
+                              excel_df.iloc[136:142, 9:10]], axis=1)
+            idfgs.columns = ['Item',
+                             'IDFGS Item', 'Total Cost']
+            st.dataframe(idfgs
+                         )
 
 
 if __name__ == '__main__':
